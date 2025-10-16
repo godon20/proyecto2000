@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Viñetas de Tabby</title>
+  <style>
+    /* === ESTILO GLOBAL === */
+    body {
+      font-family: 'Trebuchet MS', Verdana, Arial, sans-serif;
+      background: #0b1b2b url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAE0lEQVQIW2NgYGD4z8DAwMDAAAAEAwGkQm4AAAAASUVORK5CYII=') repeat;
+      color: #eee;
+      margin: 0;
+      padding: 0;
+    }
+
+    #wrap {
+      width: 900px;
+      margin: 28px auto;
+      background: linear-gradient(#f6f6f6,#e9eef6);
+      border: 6px ridge #c0d8ff;
+      color: #111;
+      box-shadow: 0 0 0 6px rgba(0,0,0,0.15);
+    }
+
+    header {
+      background: url('https://upload.wikimedia.org/wikipedia/commons/4/4f/Neon_glow.png') repeat-x, #012a4a;
+      padding: 12px 20px;
+      color: #fffb;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 34px;
+      color: #fff;
+      text-shadow: 2px 2px 0 #000;
+    }
+
+    nav {
+      background: #012a4a;
+      padding: 8px 12px;
+      border-top: 3px solid #03263a;
+    }
+    nav a {
+      color: #ffd;
+      margin-right: 12px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    nav a:hover { text-decoration: underline }
+
+    section {
+      display: none;
+      padding: 20px;
+    }
+    section.active { display: block; }
+
+    /* === GALERÍA === */
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+    }
+    .gallery img {
+      max-width: 250px;
+      border: 3px outset #c7d6ff;
+      margin: 10px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .gallery img:hover {
+      transform: scale(1.05);
+      box-shadow: 4px 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* === VISOR LIGHTBOX === */
+    #lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 10;
+    }
+
+    #lightbox img {
+      max-width: 90%;
+      max-height: 80%;
+      border: 6px solid #fff;
+      box-shadow: 0 0 40px #000;
+      cursor: grab;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1);
+      transition: none;
+    }
+
+    #lightbox img:active {
+      cursor: grabbing;
+    }
+
+    #lightbox .close {
+      position: absolute;
+      top: 18px;
+      right: 22px;
+      color: #fff;
+      font-size: 22px;
+      cursor: pointer;
+      z-index: 20;
+    }
+
+    .nav-btns {
+      position: absolute;
+      bottom: 40px;
+      text-align: center;
+      z-index: 20;
+    }
+    .nav-btns button {
+      background: #fff;
+      border: 2px outset #c0d8ff;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 0 5px;
+    }
+    .nav-btns button:hover { background: #def; }
+
+    footer {
+      font-size: 12px;
+      padding: 10px 18px;
+      background: #e9eef6;
+      border-top: 4px double #c0d8ff;
+      color: #123;
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width:960px){
+      #wrap{width:94%;}
+      .gallery img{max-width: 45%;}
+    }
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <header>
+      <h1>Viñetas de Tabby</h1>
+      <p>Galería retro de cómics personales — estilo 2000s</p>
+    </header>
+
+    <nav>
+      <a href="#" onclick="showSection('inicio')">Inicio</a>
+      <a href="#" onclick="showSection('galeria')">Galería</a>
+      <a href="#" onclick="showSection('acerca')">Acerca</a>
+    </nav>
+
+    <!-- INICIO -->
+    <section id="inicio" class="active">
+      <h2>Bienvenidos</h2>
+      <p>
+        <b>Tabby</b> es un personaje que yo cree un dia que estaba aburido, un observador sarcástico.
+        En estas viñetas encontrarás humor, ironía y un poco de nostalgia digital.
+      </p>
+      <p>
+        Cada historia es una pequeña ventana al absurdo cotidiano, dibujada con el espíritu de los blogs y foros de los años 2000.
+      </p>
+      <img src="comics/tabby.jpg" alt="Tabby muestra de cómic" style="max-width:80%;border:3px outset #c7d6ff;margin-top:10px;">
+    </section>
+
+    <!-- GALERÍA -->
+    <section id="galeria">
+      <h2>Galería de Viñetas</h2>
+      <div class="gallery">
+        <img src="comics/comic1.jpg" alt="Viñeta 1" onclick="openLightbox(0)">
+        <img src="comics/comic2.jpg" alt="Viñeta 2" onclick="openLightbox(1)">
+        <img src="comics/comic3.jpg" alt="Viñeta 3" onclick="openLightbox(2)">
+      </div>
+    </section>
+
+    <!-- ACERCA -->
+    <section id="acerca">
+      <h2>Acerca del Proyecto</h2>
+      <p>
+        <i>Viñetas de Tabby</i> es una colección personal creada con el estilo clásico de internet y los cómics alternativos.
+        Inspirada en los blogs personales y las páginas web caseras de principios de los 2000.
+      </p>
+      <p>
+        Creado con HTML.  
+        <br><br>
+        <small>esta es la bitacora personal de Tabby, .</small>
+      </p>
+    </section>
+
+    <footer>
+      &copy; 2025 — Proyecto Retro. Inspirado por las viejas páginas personales.
+    </footer>
+  </div>
+
+  <!-- VISOR LIGHTBOX -->
+  <div id="lightbox" onclick="closeLightbox(event)">
+    <div class="close" onclick="closeLightbox(event)">✕</div>
+    <img id="lb-img" src="" alt="">
+    <div class="nav-btns">
+      <button onclick="prevImg(event)">⟨ Anterior</button>
+      <button onclick="nextImg(event)">Siguiente ⟩</button>
+    </div>
+  </div>
+
+  <script>
+    // --- Cambiar secciones ---
+    function showSection(id){
+      document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    // --- Lightbox ---
+    const imgs = Array.from(document.querySelectorAll('.gallery img'));
+    let currentIndex = 0;
+
+    function openLightbox(index){
+      currentIndex = index;
+      const lb = document.getElementById('lightbox');
+      const lbImg = document.getElementById('lb-img');
+      lbImg.src = imgs[index].src;
+      lb.style.display = 'flex';
+      resetImagePosition();
+    }
+
+    function closeLightbox(e){
+      if(e.target.id === 'lightbox' || e.target.classList.contains('close')){
+        document.getElementById('lightbox').style.display = 'none';
+      }
+    }
+
+    function nextImg(e){
+      e.stopPropagation();
+      currentIndex = (currentIndex + 1) % imgs.length;
+      const lbImg = document.getElementById('lb-img');
+      lbImg.src = imgs[currentIndex].src;
+      resetImagePosition();
+    }
+
+    function prevImg(e){
+      e.stopPropagation();
+      currentIndex = (currentIndex - 1 + imgs.length) % imgs.length;
+      const lbImg = document.getElementById('lb-img');
+      lbImg.src = imgs[currentIndex].src;
+      resetImagePosition();
+    }
+
+    // --- Arrastrar imagen con el mouse + Zoom ---
+    const modalImg = document.getElementById("lb-img");
+    let isDragging = false;
+    let startX, startY, imgX = 0, imgY = 0, zoom = 1;
+
+    function resetImagePosition(){
+      imgX = 0; imgY = 0; zoom = 1;
+      modalImg.style.transform = 'translate(-50%, -50%) scale(1)';
+    }
+
+    modalImg.addEventListener("mousedown", e => {
+      isDragging = true;
+      startX = e.clientX - imgX;
+      startY = e.clientY - imgY;
+      modalImg.style.cursor = "grabbing";
+    });
+
+    window.addEventListener("mouseup", () => {
+      isDragging = false;
+      modalImg.style.cursor = "grab";
+    });
+
+    window.addEventListener("mousemove", e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      imgX = e.clientX - startX;
+      imgY = e.clientY - startY;
+      modalImg.style.transform = `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${zoom})`;
+    });
+
+    modalImg.addEventListener("wheel", e => {
+      e.preventDefault();
+      zoom += e.deltaY * -0.0015;
+      zoom = Math.min(Math.max(zoom, 0.5), 3);
+      modalImg.style.transform = `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${zoom})`;
+    });
+  </script>
+</body>
+</html>
