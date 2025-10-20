@@ -59,9 +59,19 @@
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
-      gap: 12px;
+      gap: 20px;
     }
+
+    .item {
+      display: flex;
+      text-align: center;
+      flex-direction: column;
+      text-align: center;
+      align-items: center;
+      font-family: monospace;
+      max-width: 260px;
+    }
+
     .gallery img {
       max-width: 250px;
       border: 3px outset #c7d6ff;
@@ -73,6 +83,16 @@
     .gallery img:hover {
       transform: scale(1.05);
       box-shadow: 4px 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .titulo {
+      margin-top: 6px;
+      font-size: 14px;
+      color: #123;
+      background: #c7d6ff;
+      border: 2px inset #a5baff;
+      padding: 3px 6px;
+      display: inline-block;
     }
 
     /* === VISOR LIGHTBOX === */
@@ -175,9 +195,18 @@
     <section id="galeria">
       <h2>Galería de Viñetas</h2>
       <div class="gallery">
-        <img src="comics/comic1.jpg" alt="Viñeta 1" onclick="openLightbox(0)">
-        <img src="comics/comic2.jpg" alt="Viñeta 2" onclick="openLightbox(1)">
-        <img src="comics/comic3.jpg" alt="Viñeta 3" onclick="openLightbox(2)">
+        <div class="item">
+          <img src="comics/comic1.jpg" alt="Viñeta 1" onclick="openLightbox(0)">
+          <p class="titulo">Tabby</p>
+        </div>
+        <div class="item">
+          <img src="comics/comic2.jpg" alt="Viñeta 2" onclick="openLightbox(1)">
+          <p class="titulo">prima</p>
+        </div>
+        <div class="item">
+          <img src="comics/comic3.jpg" alt="Viñeta 3" onclick="openLightbox(2)">
+          <p class="titulo">sin titulo</p>
+        </div>
       </div>
     </section>
 
@@ -191,7 +220,7 @@
       <p>
         Creado con HTML.  
         <br><br>
-        <small>esta es la bitacora personal de Tabby, .</small>
+        <small>esta es la bitacora personal de Tabby.</small>
       </p>
     </section>
 
