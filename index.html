@@ -95,6 +95,21 @@
       display: inline-block;
     }
 
+    /* === BOTÓN DESCARGAR === */
+    .descargar {
+      margin-top: 4px;
+      background: #fff;
+      border: 2px outset #c0d8ff;
+      padding: 4px 8px;
+      text-decoration: none;
+      color: #123;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .descargar:hover {
+      background: #def;
+    }
+
     /* === VISOR LIGHTBOX === */
     #lightbox {
       position: fixed;
@@ -158,13 +173,13 @@
       color: #123;
     }
 
-    /* === RESPONSIVE === */
     @media (max-width:960px){
       #wrap{width:94%;}
       .gallery img{max-width: 45%;}
     }
   </style>
 </head>
+
 <body>
   <div id="wrap">
     <header>
@@ -188,66 +203,64 @@
       <p>
         Cada historia es una pequeña ventana al absurdo cotidiano, dibujada con el espíritu de los blogs y foros de los años 2000.
       </p>
-      <img src="comics/tabby.jpg" alt="Tabby muestra de cómic" style="max-width:80%;border:3px outset #c7d6ff;margin-top:10px;">
+      <img src="comics/tabby.jpg" style="max-width:80%;border:3px outset #c7d6ff;margin-top:10px;">
     </section>
 
     <!-- GALERÍA -->
     <section id="galeria">
       <h2>Galería de Viñetas</h2>
       <div class="gallery">
+
         <div class="item">
-          <img src="comics/comic1.jpg" alt="Viñeta 1" onclick="openLightbox(0)">
+          <img src="comics/comic1.jpg" onclick="openLightbox(0)">
           <p class="titulo">Tabby</p>
         </div>
+
         <div class="item">
-          <img src="comics/comic2.jpg" alt="Viñeta 2" onclick="openLightbox(1)">
+          <img src="comics/comic2.jpg" onclick="openLightbox(1)">
           <p class="titulo">prima</p>
         </div>
+
         <div class="item">
-          <img src="comics/comic3.jpg" alt="Viñeta 3" onclick="openLightbox(2)">
+          <img src="comics/comic3.jpg" onclick="openLightbox(2)">
           <p class="titulo">dios maquina</p>
         </div>
+
         <div class="item">
-          <img src="comics/comic4.jpg" alt="Viñeta 4" onclick="openLightbox(3)">
+          <img src="comics/comic4.jpg" onclick="openLightbox(3)">
           <p class="titulo">regreso de bubsy</p>
         </div>
+
         <div class="item">
-          <img src="comics/comic5.jpg" alt="Viñeta 5" onclick="openLightbox(4)">
+          <img src="comics/comic5.jpg" onclick="openLightbox(4)">
           <p class="titulo">viscacha</p>
         </div>
+
         <div class="item">
-          <img src="comics/comic6.jpg" alt="Viñeta 6" onclick="openLightbox(5)">
+          <img src="comics/comic6.jpg" onclick="openLightbox(5)">
           <p class="titulo">La ropa</p>
         </div>
+
       </div>
     </section>
 
     <!-- ACERCA -->
     <section id="acerca">
       <h2>Acerca del Proyecto</h2>
-      <p>
-        <i>Viñetas de Tabby</i> es una colección personal creada con el estilo clásico de internet y los cómics alternativos.
-        Inspirada en los blogs personales y las páginas web caseras de principios de los 2000.
-      </p>
-      <p>
-        Creado con HTML.  
-        <br><br>
-        <small>esta es la bitacora personal de Tabby.</small>
-      </p>
+      <p><i>Viñetas de Tabby</i> es una colección personal inspirada en los blogs y páginas caseras 2000s.</p>
     </section>
 
-    <footer>
-      &copy; 2025 — Proyecto Retro. Inspirado por las viejas páginas personales.
-    </footer>
+    <footer>&copy; 2025 — Proyecto Retro.</footer>
   </div>
 
   <!-- VISOR LIGHTBOX -->
   <div id="lightbox" onclick="closeLightbox(event)">
     <div class="close" onclick="closeLightbox(event)">✕</div>
-    <img id="lb-img" src="" alt="">
+    <img id="lb-img">
     <div class="nav-btns">
       <button onclick="prevImg(event)">⟨ Anterior</button>
       <button onclick="nextImg(event)">Siguiente ⟩</button>
+      <button onclick="downloadCurrent()">Descargar</button>
     </div>
   </div>
 
@@ -264,10 +277,8 @@
 
     function openLightbox(index){
       currentIndex = index;
-      const lb = document.getElementById('lightbox');
-      const lbImg = document.getElementById('lb-img');
-      lbImg.src = imgs[index].src;
-      lb.style.display = 'flex';
+      document.getElementById('lb-img').src = imgs[index].src;
+      document.getElementById('lightbox').style.display = 'flex';
       resetImagePosition();
     }
 
@@ -280,20 +291,27 @@
     function nextImg(e){
       e.stopPropagation();
       currentIndex = (currentIndex + 1) % imgs.length;
-      const lbImg = document.getElementById('lb-img');
-      lbImg.src = imgs[currentIndex].src;
+      document.getElementById('lb-img').src = imgs[currentIndex].src;
       resetImagePosition();
     }
 
     function prevImg(e){
       e.stopPropagation();
       currentIndex = (currentIndex - 1 + imgs.length) % imgs.length;
-      const lbImg = document.getElementById('lb-img');
-      lbImg.src = imgs[currentIndex].src;
+      document.getElementById('lb-img').src = imgs[currentIndex].src;
       resetImagePosition();
     }
 
-    // --- Arrastrar imagen con el mouse + Zoom ---
+    // FUNCION PARA DESCARGAR DESDE LIGHTBOX
+    function downloadCurrent(){
+      const url = imgs[currentIndex].src;
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = url.substring(url.lastIndexOf('/')+1);
+      a.click();
+    }
+
+    // --- Arrastrar imagen + Zoom ---
     const modalImg = document.getElementById("lb-img");
     let isDragging = false;
     let startX, startY, imgX = 0, imgY = 0, zoom = 1;
