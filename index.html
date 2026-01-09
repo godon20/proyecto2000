@@ -196,6 +196,19 @@
     }
     
     /* === comentarios === */
+
+    .comment-selector {
+      margin-bottom: 10px;
+      background: #c7d6ff;
+      border: 2px inset #a5baff;
+      padding: 6px;
+      text-align: center;
+      font-family: monospace;
+    }
+    .comment-selector button {
+      font-weight: bold;
+    }
+    
     #comentarios input,
     #comentarios textarea {
       width: 400px;
@@ -340,6 +353,12 @@
         <span id="currentComicName">Ninguna</span>
       </p>
 
+      <div class="comment-selector">
+        <button onclick="prevComic()">◀</button>
+        <span id="comic-indicator">Viñeta 1</span>
+        <button onclick="nextComic()">▶</button>
+      </div>
+
       <input id="userName" placeholder="Tu nombre"><br><br>
 
       <textarea id="userComment" rows="4"
@@ -418,8 +437,15 @@
     const imgs = Array.from(document.querySelectorAll('.gallery img'));
     let currentIndex = 0;
 
+    // --- Selector de viñetas para comentarios ---
+    let currentComicIndex = 0;
+    const totalComics = document.querySelectorAll(".gallery img").length;
+
     function openLightbox(index){
       currentIndex = index;
+      currentComicIndex = index;
+      updateComicIndicator();
+      loadComments();
       document.getElementById('lb-img').src = imgs[index].src;
       document.getElementById('lightbox').style.display = 'flex';
       resetImagePosition();
@@ -494,15 +520,10 @@
     });
     // --- comentarios ---
     function loadComments() {
-      const saved = localStorage.getItem("lastComic");
-      if (saved === null) return;
-
-      currentIndex = parseInt(saved);
-
       document.getElementById("currentComicName").textContent =
-        imgs[currentIndex].nextElementSibling.textContent;
+        imgs[currentComicIndex].nextElementSibling.textContent;
       
-      const key = "comments_img_" + currentIndex;
+      const key = "comments_img_" + currentComicIndex;
       const comments = JSON.parse(localStorage.getItem(key)) || [];
       const list = document.getElementById("commentList");
       list.innerHTML = "";
@@ -533,7 +554,7 @@
       const text = document.getElementById("userComment").value;
       if (!text.trim()) return;
 
-      const key = "comments_img_" + currentIndex;
+      const key = "comments_img_" + currentComicIndex;
       const comments = JSON.parse(localStorage.getItem(key)) || [];
       
       comments.push({ 
@@ -551,10 +572,10 @@
     }
 
     function likeComment(index) {
-      const key = "comments_img_" + currentIndex;
+      const key = "comments_img_" + currentComicIndex;
       const comments = JSON.parse(localStorage.getItem(key)) || [];
 
-      const likeKey = `liked_${currentIndex}_${index}`;
+      const likeKey = `liked_${currentComicIndex}_${index}`;
 
       if (localStorage.getItem(likeKey)) {
         alert("Ya diste me gusta a este comentario 🙂");
@@ -571,7 +592,7 @@
     function deleteComment(index) {
       if (!confirm("¿Borrar este comentario?")) return;
 
-      const key = "comments_img_" + currentIndex;
+      const key = "comments_img_" + currentComicIndex;
       const comments = JSON.parse(localStorage.getItem(key)) || [];
 
       comments.splice(index, 1);
@@ -580,8 +601,28 @@
       loadComments();
     }
 
+    function updateComicIndicator() {
+      document.getElementById("comic-indicator").textContent =
+        "Viñeta " + (currentComicIndex + 1);
+    }
+
+    function nextComic() {
+      currentComicIndex = (currentComicIndex + 1) % totalComics;
+      updateComicIndicator();
+      loadComments();
+    }
+
+    function prevComic() {
+      currentComicIndex =
+        (currentComicIndex - 1 + totalComics) % totalComics;
+      updateComicIndicator();
+      loadComments();
+    }
+
     window.addEventListener("load", () => {
       countVisit();
+      updateComicIndicator();
+      loadComments();
     });
   </script>
 </body>
