@@ -177,6 +177,73 @@
       #wrap{width:94%;}
       .gallery img{max-width: 45%;}
     }
+    /* === VISOR LIGHTBOX === */
+    #commentsBox {
+      position: absolute;
+      bottom: 110px;
+      background: #eef;
+      border: 2px inset #a5baff;
+      padding: 8px;
+      width: 320px;
+      font-size: 12px;
+    }
+
+    #commentsBox input,
+    #commentsBox textarea {
+      width: 95%;
+      margin-top: 4px;
+      font-family: monospace;
+    }
+    
+    /* === comentarios === */
+    #comentarios input,
+    #comentarios textarea {
+      width: 400px;
+      max-width: 95%;
+      font-family: monospace;
+    }
+
+    #comentarios button {
+      background: #fff;
+      border: 2px outset #c0d8ff;
+      padding: 6px 12px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #commentList div {
+      margin-top: 8px;
+      padding: 6px;
+      background: #eef;
+      border: 2px inset #a5baff;
+      font-size: 13px;
+    }
+
+    #commentList button {
+      margin-right: 6px;
+      margin-top: 6px;
+      background: #fff;
+      border: 2px outset #c0d8ff;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    #commentList button:hover {
+      background: #def;
+    }
+
+    #commentList span {
+      font-family: monospace;
+    }
+    
+    #visitCounter, #viewCount {
+      font-family: monospace;
+      background: #eee;
+      padding: 3px 6px;
+      border: 1px inset #999;
+      display: inline-block;
+    }
+
   </style>
 </head>
 
@@ -191,6 +258,7 @@
       <a href="#" onclick="showSection('inicio')">Inicio</a>
       <a href="#" onclick="showSection('galeria')">Galería</a>
       <a href="#" onclick="showSection('acerca')">Acerca</a>
+      <a href="#" onclick="showSection('comentarios')">Comentarios</a>
     </nav>
 
     <!-- INICIO -->
@@ -209,6 +277,9 @@
     <!-- GALERÍA -->
     <section id="galeria">
       <h2>Galería de Viñetas</h2>
+      <div id="visitCounter" style="font-size:12px;">
+        👁️ Visitas: 0
+      </div>
       <div class="gallery">
 
         <div class="item">
@@ -259,6 +330,27 @@
       </div>
     </section>
 
+    <!-- COMENTARIOS -->
+    <section id="comentarios">
+      <h2>Comentarios de Viñetas</h2>
+
+      <p>
+        Comentarios guardados por imagen.<br>
+        <b>Viñeta actual:</b>
+        <span id="currentComicName">Ninguna</span>
+      </p>
+
+      <input id="userName" placeholder="Tu nombre"><br><br>
+
+      <textarea id="userComment" rows="4"
+        placeholder="Escribí tu comentario..."></textarea><br><br>
+
+      <button onclick="addComment()">Enviar comentario</button>
+
+      <h3>Mensajes</h3>
+      <div id="commentList"></div>
+    </section>
+
     <!-- ACERCA -->
     <section id="acerca">
       <h2>Acerca del Proyecto</h2>
@@ -280,10 +372,46 @@
   </div>
 
   <script>
+    // --- ID DE AUTOR LOCAL ---
+    let authorId = localStorage.getItem("authorId");
+
+    if (!authorId) {
+      authorId = "author_" + Math.random().toString(36).substr(2, 9);
+      localStorage.setItem("authorId", authorId);
+    }
+
+    function retroDate() {
+      const d = new Date();
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const year = d.getFullYear();
+      const hour = String(d.getHours()).padStart(2, "0");
+      const min = String(d.getMinutes()).padStart(2, "0");
+
+      return `${day}/${month}/${year} - ${hour}:${min}`;
+    }
+
+    // --- vistas ---
+    function countVisit() {
+      let visits = parseInt(localStorage.getItem("pageVisits")) || 0;
+      let visited = localStorage.getItem("visited");
+
+      if (!visited) {
+        visits++;
+        localStorage.setItem("pageVisits", visits);
+        localStorage.setItem("visited", "true");
+      }
+
+      document.getElementById("visitCounter").textContent =
+        "👁️ Visitas: " + visits;
+    }
+
     // --- Cambiar secciones ---
     function showSection(id){
       document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+
+      if(id === "comentarios") loadComments();
     }
 
     // --- Lightbox ---
@@ -295,6 +423,8 @@
       document.getElementById('lb-img').src = imgs[index].src;
       document.getElementById('lightbox').style.display = 'flex';
       resetImagePosition();
+
+      localStorage.setItem("lastComic", index);
     }
 
     function closeLightbox(e){
@@ -361,6 +491,97 @@
       zoom += e.deltaY * -0.0015;
       zoom = Math.min(Math.max(zoom, 0.5), 3);
       modalImg.style.transform = `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${zoom})`;
+    });
+    // --- comentarios ---
+    function loadComments() {
+      const saved = localStorage.getItem("lastComic");
+      if (saved === null) return;
+
+      currentIndex = parseInt(saved);
+
+      document.getElementById("currentComicName").textContent =
+        imgs[currentIndex].nextElementSibling.textContent;
+      
+      const key = "comments_img_" + currentIndex;
+      const comments = JSON.parse(localStorage.getItem(key)) || [];
+      const list = document.getElementById("commentList");
+      list.innerHTML = "";
+
+      comments.forEach((c, i) => {
+        const canDelete = c.authorId === authorId;
+        
+        list.innerHTML += `
+          <div>
+            <b>${c.name}</b>
+            <span style="font-size:11px;color:#555;">
+              (${c.date})
+            </span><br>
+            ${c.text}<br>
+            
+            <button onclick="likeComment(${i})">
+              👍 Me gusta (${c.likes || 0})
+            </button>
+
+            ${canDelete ? `<button onclick="deleteComment(${i})">🗑 Borrar</button>` : ``}
+          </div>
+         `;
+      });
+    }
+
+    function addComment() {
+      const name = document.getElementById("userName").value || "Anónimo";
+      const text = document.getElementById("userComment").value;
+      if (!text.trim()) return;
+
+      const key = "comments_img_" + currentIndex;
+      const comments = JSON.parse(localStorage.getItem(key)) || [];
+      
+      comments.push({ 
+        name, 
+        text,
+        authorId,
+        date: retroDate(),
+        likes: 0
+      });
+      
+      localStorage.setItem(key, JSON.stringify(comments));
+
+      document.getElementById("userComment").value = "";
+      loadComments();
+    }
+
+    function likeComment(index) {
+      const key = "comments_img_" + currentIndex;
+      const comments = JSON.parse(localStorage.getItem(key)) || [];
+
+      const likeKey = `liked_${currentIndex}_${index}`;
+
+      if (localStorage.getItem(likeKey)) {
+        alert("Ya diste me gusta a este comentario 🙂");
+        return;
+      }
+
+      comments[index].likes = (comments[index].likes || 0) + 1;
+      localStorage.setItem(key, JSON.stringify(comments));
+      localStorage.setItem(likeKey, "1");
+
+      loadComments();
+    }
+
+    function deleteComment(index) {
+      if (!confirm("¿Borrar este comentario?")) return;
+
+      const key = "comments_img_" + currentIndex;
+      const comments = JSON.parse(localStorage.getItem(key)) || [];
+
+      comments.splice(index, 1);
+      localStorage.setItem(key, JSON.stringify(comments));
+
+      loadComments();
+    }
+
+    window.addEventListener("load", () => {
+      countVisit();
     });
   </script>
 </body>
