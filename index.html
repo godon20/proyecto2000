@@ -527,17 +527,16 @@
     }
 
     function nextComic() {
-      window.currentComicIndex = (window.currentComicIndex + 1) % totalComics;
+      currentComicIndex = (currentComicIndex + 1) % totalComics;
       updateComicIndicator();
-      if (window.listenComments) window.listenComments();
+      if (window.reloadComments) window.reloadComments();
     }
 
     function prevComic() {
-      window.currentComicIndex =
       currentComicIndex =
-        (window.currentComicIndex - 1 + totalComics) % totalComics;
+        (currentComicIndex - 1 + totalComics) % totalComics;
       updateComicIndicator();
-      if (window.listenComments) window.listenComments();
+      if (window.reloadComments) window.reloadComments();
     }
 
     window.addEventListener("load", () => {
@@ -549,4 +548,5 @@
   <script type="module" src="js/comments.js"></script>
 </body>
 </html>
+
 
