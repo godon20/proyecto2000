@@ -1,5 +1,5 @@
-import { db } from "./firebase.js";
 import {
+  getFirestore,
   collection,
   addDoc,
   query,
@@ -8,108 +8,98 @@ import {
   onSnapshot,
   deleteDoc,
   doc,
+  updateDoc,
+  increment,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* =========================
-   ID LOCAL DEL AUTOR
-========================= */
-let authorId = localStorage.getItem("authorId");
-if (!authorId) {
-  authorId = crypto.randomUUID();
-  localStorage.setItem("authorId", authorId);
-}
+import { app } from "./firebase.js";
 
-/* =========================
-   REFERENCIAS HTML
-========================= */
-const commentsList = document.getElementById("commentsList");
+const db = getFirestore(app);
+
+// elementos HTML
 const nameInput = document.getElementById("name");
 const commentInput = document.getElementById("comment");
 const sendBtn = document.getElementById("sendComment");
+const commentsList = document.getElementById("commentsList");
 
-/* =========================
-   ESTADO VIÑETA
-========================= */
-let currentComicIndex = 0;
+// ID local del autor (ya creado en el HTML)
+const authorId = localStorage.getItem("authorId");
 
-/* =========================
-   ESCUCHAR COMENTARIOS
-========================= */
-let unsubscribe = null;
+// referencia a colección
+const commentsRef = collection(db, "comments");
 
+// escuchar cambios según viñeta
 function listenComments() {
-  if (unsubscribe) unsubscribe();
-
   const q = query(
-    collection(db, "comments"),
-    where("comic", "==", currentComicIndex),
-    orderBy("created", "asc")
+    commentsRef,
+    where("comicIndex", "==", window.currentComicIndex),
+    orderBy("createdAt", "asc")
   );
 
-  unsubscribe = onSnapshot(q, (snapshot) => {
+  onSnapshot(q, snapshot => {
     commentsList.innerHTML = "";
 
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
+    snapshot.forEach(docSnap => {
+      const c = docSnap.data();
       const div = document.createElement("div");
-      div.className = "comment";
+
+      const canDelete = c.authorId === authorId;
 
       div.innerHTML = `
-        <strong>${data.name}</strong>
-        <small> • ${data.created?.toDate().toLocaleString() || ""}</small>
-        <p>${data.text}</p>
-        ${
-          data.authorId === authorId
-            ? `<button data-id="${docSnap.id}" class="delete-btn">🗑 borrar</button>`
-            : ""
-        }
+        <b>${c.name}</b>
+        <span style="font-size:11px;color:#555;">
+          (${c.date})
+        </span><br>
+
+        ${c.text}<br>
+
+        <button data-like>👍 ${c.likes || 0}</button>
+        ${canDelete ? `<button data-del>🗑 borrar</button>` : ``}
       `;
+
+      // like
+      div.querySelector("[data-like]").onclick = () =>
+        updateDoc(doc(db, "comments", docSnap.id), {
+          likes: increment(1)
+        });
+
+      // borrar (solo propio)
+      if (canDelete) {
+        div.querySelector("[data-del]").onclick = () =>
+          deleteDoc(doc(db, "comments", docSnap.id));
+      }
 
       commentsList.appendChild(div);
     });
   });
 }
 
-/* =========================
-   ENVIAR COMENTARIO
-========================= */
+// enviar comentario
 sendBtn.addEventListener("click", async () => {
   const name = nameInput.value.trim();
   const text = commentInput.value.trim();
 
-  if (!name || !text) return;
+  if (!name || !text) return alert("Completa nombre y comentario");
 
-  await addDoc(collection(db, "comments"), {
+  await addDoc(commentsRef, {
     name,
     text,
-    comic: currentComicIndex,
     authorId,
-    created: serverTimestamp()
+    comicIndex: window.currentComicIndex,
+    likes: 0,
+    date: new Date().toLocaleString("es-AR"),
+    createdAt: serverTimestamp()
   });
 
   commentInput.value = "";
 });
 
-/* =========================
-   BORRAR COMENTARIO
-========================= */
-commentsList.addEventListener("click", async (e) => {
-  if (!e.target.classList.contains("delete-btn")) return;
-
-  const id = e.target.dataset.id;
-  await deleteDoc(doc(db, "comments", id));
+// escuchar cambios de viñeta
+window.addEventListener("load", () => {
+  listenComments();
 });
 
-/* =========================
-   CAMBIO DE VIÑETA
-========================= */
-window.loadComments = function (index = currentComicIndex) {
-  currentComicIndex = index;
+window.addEventListener("click", () => {
   listenComments();
-};
-
-/* =========================
-   INICIAL
-========================= */
-listenComments();
+});
