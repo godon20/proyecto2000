@@ -3,13 +3,8 @@ import {
   collection,
   addDoc,
   query,
-  where,
   orderBy,
   onSnapshot,
-  deleteDoc,
-  doc,
-  updateDoc,
-  increment,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -17,89 +12,74 @@ import { app } from "./firebase.js";
 
 const db = getFirestore(app);
 
-// elementos HTML
 const nameInput = document.getElementById("name");
 const commentInput = document.getElementById("comment");
 const sendBtn = document.getElementById("sendComment");
-const commentsList = document.getElementById("commentsList");
+const list = document.getElementById("commentList");
 
-// ID local del autor (ya creado en el HTML)
-const authorId = localStorage.getItem("authorId");
+// escuchar comentarios por viñeta
+window.listenComments = function () {
+  if (!list) return;
 
-// referencia a colección
-const commentsRef = collection(db, "comments");
+  list.innerHTML = "Cargando comentarios...";
 
-// escuchar cambios según viñeta
-function listenComments() {
+  const comicId = "comic_" + window.currentComicIndex;
+
   const q = query(
-    commentsRef,
-    where("comicIndex", "==", window.currentComicIndex),
-    orderBy("createdAt", "asc")
+    collection(db, "comments", comicId, "messages"),
+    orderBy("date", "asc")
   );
 
-  onSnapshot(q, snapshot => {
-    commentsList.innerHTML = "";
+  onSnapshot(q, (snapshot) => {
+    list.innerHTML = "";
 
-    snapshot.forEach(docSnap => {
-      const c = docSnap.data();
+    if (snapshot.empty) {
+      list.innerHTML = "<i>No hay comentarios todavía</i>";
+      return;
+    }
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+
       const div = document.createElement("div");
-
-      const canDelete = c.authorId === authorId;
-
       div.innerHTML = `
-        <b>${c.name}</b>
-        <span style="font-size:11px;color:#555;">
-          (${c.date})
-        </span><br>
-
-        ${c.text}<br>
-
-        <button data-like>👍 ${c.likes || 0}</button>
-        ${canDelete ? `<button data-del>🗑 borrar</button>` : ``}
+        <b>${data.name}</b><br>
+        ${data.text}<br>
+        <span style="font-size:11px;color:#555">
+          ${data.date?.toDate().toLocaleString() || ""}
+        </span>
       `;
-
-      // like
-      div.querySelector("[data-like]").onclick = () =>
-        updateDoc(doc(db, "comments", docSnap.id), {
-          likes: increment(1)
-        });
-
-      // borrar (solo propio)
-      if (canDelete) {
-        div.querySelector("[data-del]").onclick = () =>
-          deleteDoc(doc(db, "comments", docSnap.id));
-      }
-
-      commentsList.appendChild(div);
+      list.appendChild(div);
     });
   });
-}
+};
 
 // enviar comentario
 sendBtn.addEventListener("click", async () => {
   const name = nameInput.value.trim();
   const text = commentInput.value.trim();
 
-  if (!name || !text) return alert("Completa nombre y comentario");
+  if (!name || !text) {
+    alert("Completa nombre y comentario");
+    return;
+  }
 
-  await addDoc(commentsRef, {
-    name,
-    text,
-    authorId,
-    comicIndex: window.currentComicIndex,
-    likes: 0,
-    date: new Date().toLocaleString("es-AR"),
-    createdAt: serverTimestamp()
-  });
+  const comicId = "comic_" + window.currentComicIndex;
+
+  await addDoc(
+    collection(db, "comments", comicId, "messages"),
+    {
+      name,
+      text,
+      date: serverTimestamp()
+    }
+  );
 
   commentInput.value = "";
 });
 
-// escuchar cambios de viñeta
+// cargar al iniciar
 window.addEventListener("load", () => {
-  listenComments();
+  window.listenComments();
 });
 
-window.addEventListener("click", () => {
-  listenComments();
-});
