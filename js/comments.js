@@ -12,14 +12,17 @@ import { app } from "./firebase.js";
 
 const db = getFirestore(app);
 
-const nameInput = document.getElementById("name");
-const commentInput = document.getElementById("comment");
-const sendBtn = document.getElementById("sendComment");
-const list = document.getElementById("commentList");
+let nameInput;
+let commentInput;
+let sendBtn;
+let list;
+let unsubscribe = null;
 
 // escuchar comentarios por viñeta
-window.listenComments = function () {
+function listenComments() {
   if (!list) return;
+
+  if (unsubscribe) unsubscribe(); // detener listener anterior
 
   list.innerHTML = "Cargando comentarios...";
 
@@ -30,7 +33,7 @@ window.listenComments = function () {
     orderBy("date", "asc")
   );
 
-  onSnapshot(q, (snapshot) => {
+  unsubscribe = onSnapshot(q, (snapshot) => {
     list.innerHTML = "";
 
     if (snapshot.empty) {
@@ -52,35 +55,43 @@ window.listenComments = function () {
       list.appendChild(div);
     });
   });
-};
+}
 
-// enviar comentario
-sendBtn.addEventListener("click", async () => {
-  const name = nameInput.value.trim();
-  const text = commentInput.value.trim();
-
-  if (!name || !text) {
-    alert("Completa nombre y comentario");
-    return;
-  }
-
-  const comicId = "comic_" + window.currentComicIndex;
-
-  await addDoc(
-    collection(db, "comments", comicId, "messages"),
-    {
-      name,
-      text,
-      date: serverTimestamp()
-    }
-  );
-
-  commentInput.value = "";
-});
-
-// cargar al iniciar
+// iniciar cuando el DOM esté listo
 window.addEventListener("load", () => {
-  window.listenComments();
+  nameInput = document.getElementById("name");
+  commentInput = document.getElementById("comment");
+  sendBtn = document.getElementById("sendComment");
+  list = document.getElementById("commentList");
+
+  listenComments();
+
+  sendBtn.addEventListener("click", async () => {
+    const name = nameInput.value.trim();
+    const text = commentInput.value.trim();
+
+    if (!name || !text) {
+      alert("Completa nombre y comentario");
+      return;
+    }
+
+    const comicId = "comic_" + window.currentComicIndex;
+
+    await addDoc(
+      collection(db, "comments", comicId, "messages"),
+      {
+        name,
+        text,
+        date: serverTimestamp()
+      }
+    );
+
+    commentInput.value = "";
+  });
 });
+
+// para recargar comentarios al cambiar de viñeta
+window.reloadComments = listenComments;
+
 
 
