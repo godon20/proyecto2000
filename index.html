@@ -359,15 +359,15 @@
         <button onclick="nextComic()">▶</button>
       </div>
 
-      <input id="userName" placeholder="Tu nombre"><br><br>
+      <input id="name" placeholder="Tu nombre"><br><br>
 
-      <textarea id="userComment" rows="4"
-        placeholder="Escribí tu comentario..."></textarea><br><br>
+      <textarea id="comment" rows="4"
+        placeholder="Escribí tu comentario..."></textarea>
 
-      <button onclick="addComment()">Enviar comentario</button>
+      <button id="sendComment">Enviar comentario</button>
 
       <h3>Mensajes</h3>
-      <div id="commentList"></div>
+      <div id="commentsList"></div>
     </section>
 
     <!-- ACERCA -->
@@ -411,6 +411,13 @@
     }
 
     // --- vistas ---
+    function showSection(id){
+      document.querySelectorAll('section').forEach(s =>
+        s.classList.remove('active')
+      );
+      document.getElementById(id).classList.add('active');
+    }
+    
     function countVisit() {
       let visits = parseInt(localStorage.getItem("pageVisits")) || 0;
       let visited = localStorage.getItem("visited");
@@ -426,26 +433,19 @@
     }
 
     // --- Cambiar secciones ---
-    function showSection(id){
-      document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-
-      if(id === "comentarios") loadComments();
-    }
 
     // --- Lightbox ---
     const imgs = Array.from(document.querySelectorAll('.gallery img'));
     let currentIndex = 0;
 
     // --- Selector de viñetas para comentarios ---
-    let currentComicIndex = 0;
+    window.currentComicIndex = 0;
     const totalComics = document.querySelectorAll(".gallery img").length;
 
     function openLightbox(index){
       currentIndex = index;
       currentComicIndex = index;
       updateComicIndicator();
-      loadComments();
       document.getElementById('lb-img').src = imgs[index].src;
       document.getElementById('lightbox').style.display = 'flex';
       resetImagePosition();
@@ -519,92 +519,7 @@
       modalImg.style.transform = `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${zoom})`;
     });
     // --- comentarios ---
-    function loadComments() {
-      document.getElementById("currentComicName").textContent =
-        imgs[currentComicIndex].nextElementSibling.textContent;
-      
-      const key = "comments_img_" + currentComicIndex;
-      const comments = JSON.parse(localStorage.getItem(key)) || [];
-      const list = document.getElementById("commentList");
-      list.innerHTML = "";
 
-      comments.forEach((c, i) => {
-        const canDelete = c.authorId === authorId;
-        
-        list.innerHTML += `
-          <div>
-            <b>${c.name}</b>
-            <span style="font-size:11px;color:#555;">
-              (${c.date})
-            </span><br>
-
-            <span style="font-size:10px;color:#777;font-family:monospace;">
-              ID: ${c.authorId}
-            </span><br>
-            
-            ${c.text}<br>
-            
-            <button onclick="likeComment(${i})">
-              👍 Me gusta (${c.likes || 0})
-            </button>
-
-            ${canDelete ? `<button onclick="deleteComment(${i})">🗑 Borrar</button>` : ``}
-          </div>
-         `;
-      });
-    }
-
-    function addComment() {
-      const name = document.getElementById("userName").value || "Anónimo";
-      const text = document.getElementById("userComment").value;
-      if (!text.trim()) return;
-
-      const key = "comments_img_" + currentComicIndex;
-      const comments = JSON.parse(localStorage.getItem(key)) || [];
-      
-      comments.push({ 
-        name, 
-        text,
-        authorId,
-        date: retroDate(),
-        likes: 0
-      });
-      
-      localStorage.setItem(key, JSON.stringify(comments));
-
-      document.getElementById("userComment").value = "";
-      loadComments();
-    }
-
-    function likeComment(index) {
-      const key = "comments_img_" + currentComicIndex;
-      const comments = JSON.parse(localStorage.getItem(key)) || [];
-
-      const likeKey = `liked_${currentComicIndex}_${index}`;
-
-      if (localStorage.getItem(likeKey)) {
-        alert("Ya diste me gusta a este comentario 🙂");
-        return;
-      }
-
-      comments[index].likes = (comments[index].likes || 0) + 1;
-      localStorage.setItem(key, JSON.stringify(comments));
-      localStorage.setItem(likeKey, "1");
-
-      loadComments();
-    }
-
-    function deleteComment(index) {
-      if (!confirm("¿Borrar este comentario?")) return;
-
-      const key = "comments_img_" + currentComicIndex;
-      const comments = JSON.parse(localStorage.getItem(key)) || [];
-
-      comments.splice(index, 1);
-      localStorage.setItem(key, JSON.stringify(comments));
-
-      loadComments();
-    }
 
     function updateComicIndicator() {
       document.getElementById("comic-indicator").textContent =
@@ -612,22 +527,22 @@
     }
 
     function nextComic() {
-      currentComicIndex = (currentComicIndex + 1) % totalComics;
+      window.currentComicIndex = (window.currentComicIndex + 1) % totalComics;
       updateComicIndicator();
-      loadComments();
+      if (window.listenComments) window.listenComments();
     }
 
     function prevComic() {
+      window.currentComicIndex =
       currentComicIndex =
-        (currentComicIndex - 1 + totalComics) % totalComics;
+        (window.currentComicIndex - 1 + totalComics) % totalComics;
       updateComicIndicator();
-      loadComments();
+      if (window.listenComments) window.listenComments();
     }
 
     window.addEventListener("load", () => {
       countVisit();
       updateComicIndicator();
-      loadComments();
     });
   </script>
   <script type="module" src="js/firebase.js"></script>
