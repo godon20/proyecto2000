@@ -149,6 +149,14 @@
       z-index: 20;
     }
 
+    #visitCounter, #viewCount {
+        font-family: monospace;
+        background: #eee;
+        padding: 3px 6px;
+        border: 1px inset #999;
+        display: inline-block;
+    }
+
     .nav-btns {
       position: absolute;
       bottom: 40px;
@@ -177,86 +185,6 @@
       #wrap{width:94%;}
       .gallery img{max-width: 45%;}
     }
-    /* === VISOR LIGHTBOX === */
-    #commentsBox {
-      position: absolute;
-      bottom: 110px;
-      background: #eef;
-      border: 2px inset #a5baff;
-      padding: 8px;
-      width: 320px;
-      font-size: 12px;
-    }
-
-    #commentsBox input,
-    #commentsBox textarea {
-      width: 95%;
-      margin-top: 4px;
-      font-family: monospace;
-    }
-    
-    /* === comentarios === */
-
-    .comment-selector {
-      margin-bottom: 10px;
-      background: #c7d6ff;
-      border: 2px inset #a5baff;
-      padding: 6px;
-      text-align: center;
-      font-family: monospace;
-    }
-    .comment-selector button {
-      font-weight: bold;
-    }
-    
-    #comentarios input,
-    #comentarios textarea {
-      width: 400px;
-      max-width: 95%;
-      font-family: monospace;
-    }
-
-    #comentarios button {
-      background: #fff;
-      border: 2px outset #c0d8ff;
-      padding: 6px 12px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    #commentList div {
-      margin-top: 8px;
-      padding: 6px;
-      background: #eef;
-      border: 2px inset #a5baff;
-      font-size: 13px;
-    }
-
-    #commentList button {
-      margin-right: 6px;
-      margin-top: 6px;
-      background: #fff;
-      border: 2px outset #c0d8ff;
-      font-size: 11px;
-      cursor: pointer;
-    }
-
-    #commentList button:hover {
-      background: #def;
-    }
-
-    #commentList span {
-      font-family: monospace;
-    }
-    
-    #visitCounter, #viewCount {
-      font-family: monospace;
-      background: #eee;
-      padding: 3px 6px;
-      border: 1px inset #999;
-      display: inline-block;
-    }
-
   </style>
 </head>
 
@@ -271,7 +199,6 @@
       <a href="#" onclick="showSection('inicio')">Inicio</a>
       <a href="#" onclick="showSection('galeria')">Galería</a>
       <a href="#" onclick="showSection('acerca')">Acerca</a>
-      <a href="#" onclick="showSection('comentarios')">Comentarios</a>
     </nav>
 
     <!-- INICIO -->
@@ -289,10 +216,10 @@
 
     <!-- GALERÍA -->
     <section id="galeria">
+        <div id="visitCounter" style="font-size:12px;">
+            👁️ Visitas: 0
+        </div>
       <h2>Galería de Viñetas</h2>
-      <div id="visitCounter" style="font-size:12px;">
-        👁️ Visitas: 0
-      </div>
       <div class="gallery">
 
         <div class="item">
@@ -326,48 +253,21 @@
         </div>
 
         <div class="item">
-          <img src="comics/comic7.jpg" onclick="openLightbox(6)">
-          <p class="titulo">la pizza</p>
+            <img src="comics/comic7.jpg" onclick="openLightbox(6)">
+            <p class="titulo">la pizza</p>
         </div>
 
         <div class="item">
-          <img src="comics/comic8.jpg" onclick="openLightbox(7)">
-          <p class="titulo">La ortografía</p>
+            <img src="comics/comic8.jpg" onclick="openLightbox(7)">
+            <p class="titulo">La ortografía</p>
         </div>
 
         <div class="item">
-          <img src="comics/comic9.jpg" onclick="openLightbox(8)">
-          <p class="titulo">rock</p>
+            <img src="comics/comic9.jpg" onclick="openLightbox(8)">
+            <p class="titulo">rock</p>
         </div>
 
       </div>
-    </section>
-
-    <!-- COMENTARIOS -->
-    <section id="comentarios">
-      <h2>Comentarios de Viñetas</h2>
-
-      <p>
-        Comentarios guardados por imagen.<br>
-        <b>Viñeta actual:</b>
-        <span id="currentComicName">Ninguna</span>
-      </p>
-
-      <div class="comment-selector">
-        <button onclick="prevComic()">◀</button>
-        <span id="comic-indicator">Viñeta 1</span>
-        <button onclick="nextComic()">▶</button>
-      </div>
-
-      <input id="name" placeholder="Tu nombre"><br><br>
-
-      <textarea id="comment" rows="4"
-        placeholder="Escribí tu comentario..."></textarea>
-
-      <button id="sendComment">Enviar comentario</button>
-
-      <h3>Mensajes</h3>
-      <div id="commentsList"></div>
     </section>
 
     <!-- ACERCA -->
@@ -391,66 +291,21 @@
   </div>
 
   <script>
-    // --- ID DE AUTOR LOCAL ---
-    let authorId = localStorage.getItem("authorId");
-
-    if (!authorId) {
-      authorId = "author_" + Math.random().toString(36).substr(2, 9);
-      localStorage.setItem("authorId", authorId);
-    }
-
-    function retroDate() {
-      const d = new Date();
-      const day = String(d.getDate()).padStart(2, "0");
-      const month = String(d.getMonth() + 1).padStart(2, "0");
-      const year = d.getFullYear();
-      const hour = String(d.getHours()).padStart(2, "0");
-      const min = String(d.getMinutes()).padStart(2, "0");
-
-      return `${day}/${month}/${year} - ${hour}:${min}`;
-    }
-
-    // --- vistas ---
+    // --- Cambiar secciones ---
     function showSection(id){
-      document.querySelectorAll('section').forEach(s =>
-        s.classList.remove('active')
-      );
+      document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
-    
-    function countVisit() {
-      let visits = parseInt(localStorage.getItem("pageVisits")) || 0;
-      let visited = localStorage.getItem("visited");
-
-      if (!visited) {
-        visits++;
-        localStorage.setItem("pageVisits", visits);
-        localStorage.setItem("visited", "true");
-      }
-
-      document.getElementById("visitCounter").textContent =
-        "👁️ Visitas: " + visits;
-    }
-
-    // --- Cambiar secciones ---
 
     // --- Lightbox ---
     const imgs = Array.from(document.querySelectorAll('.gallery img'));
     let currentIndex = 0;
 
-    // --- Selector de viñetas para comentarios ---
-    window.currentComicIndex = 0;
-    const totalComics = document.querySelectorAll(".gallery img").length;
-
     function openLightbox(index){
       currentIndex = index;
-      currentComicIndex = index;
-      updateComicIndicator();
       document.getElementById('lb-img').src = imgs[index].src;
       document.getElementById('lightbox').style.display = 'flex';
       resetImagePosition();
-
-      localStorage.setItem("lastComic", index);
     }
 
     function closeLightbox(e){
@@ -481,6 +336,22 @@
       a.download = url.substring(url.lastIndexOf('/')+1);
       a.click();
     }
+
+    // FUNCION PARA DESCARGAR DESDE LIGHTBOX
+    function countVisit() {
+        let visits = parseInt(localStorage.getItem("pageVisits")) || 0;
+        let visited = localStorage.getItem("visited");
+
+        if (!visited) {
+            visits++;
+            localStorage.setItem("pageVisits", visits);
+            localStorage.setItem("visited", "true");
+        }
+
+        document.getElementById("visitCounter").textContent =
+            "👁️ Visitas: " + visits;
+    }
+
 
     // --- Arrastrar imagen + Zoom ---
     const modalImg = document.getElementById("lb-img");
@@ -518,36 +389,12 @@
       zoom = Math.min(Math.max(zoom, 0.5), 3);
       modalImg.style.transform = `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${zoom})`;
     });
-    // --- comentarios ---
 
-
-    function updateComicIndicator() {
-      document.getElementById("comic-indicator").textContent =
-        "Viñeta " + (currentComicIndex + 1);
-    }
-
-    function nextComic() {
-      currentComicIndex = (currentComicIndex + 1) % totalComics;
-      updateComicIndicator();
-      if (window.reloadComments) window.reloadComments();
-    }
-
-    function prevComic() {
-      currentComicIndex =
-        (currentComicIndex - 1 + totalComics) % totalComics;
-      updateComicIndicator();
-      if (window.reloadComments) window.reloadComments();
-    }
-
-    window.addEventListener("load", () => {
-      countVisit();
-      updateComicIndicator();
-    });
+    window.onload = () => {
+        countVisit();
+    };
   </script>
-<script type="module" src="js/firebase.js"></script>
-<script type="module" src="js/comments.js"></script>
 </body>
 </html>
-
 
 
