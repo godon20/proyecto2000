@@ -5,442 +5,937 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Viñetas de Tabby</title>
   <style>
-    /* === ESTILO GLOBAL === */
+    * { box-sizing: border-box; }
+
     body {
-      font-family: 'Trebuchet MS', Verdana, Arial, sans-serif;
-      background: #0b1b2b url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAE0lEQVQIW2NgYGD4z8DAwMDAAAAEAwGkQm4AAAAASUVORK5CYII=') repeat;
-      color: #eee;
+      font-family: 'MS Sans Serif', Arial, sans-serif;
+      font-size: 13px;
+      background: #008080;
+      background-image: none;
+      color: #000;
       margin: 0;
+      padding: 10px;
+    }
+
+    /* === VENTANA PRINCIPAL === */
+    #wrap {
+      width: 900px;
+      margin: 0 auto;
+      background: #c0c0c0;
+      border-top: 2px solid #ffffff;
+      border-left: 2px solid #ffffff;
+      border-right: 2px solid #808080;
+      border-bottom: 2px solid #808080;
+      box-shadow: 2px 2px 0 #000;
+    }
+
+    /* === BARRA DE TÍTULO === */
+    .titlebar {
+      background: linear-gradient(to right, #000080, #1084d0);
+      color: #fff;
+      padding: 3px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .titlebar-left {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: bold;
+      font-size: 13px;
+    }
+    .titlebar-icon {
+      width: 16px;
+      height: 16px;
+      background: #ffff00;
+      border: 1px solid #808080;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .titlebar-btns {
+      display: flex;
+      gap: 2px;
+    }
+    .titlebar-btns button {
+      width: 18px;
+      height: 16px;
+      font-size: 10px;
+      font-weight: bold;
+      background: #c0c0c0;
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #808080;
+      border-bottom: 1px solid #808080;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       padding: 0;
     }
 
-    #wrap {
-      width: 900px;
-      margin: 28px auto;
-      background: linear-gradient(#f6f6f6,#e9eef6);
-      border: 6px ridge #c0d8ff;
-      color: #111;
-      box-shadow: 0 0 0 6px rgba(0,0,0,0.15);
+    /* === BARRA DE MENÚ === */
+    .menubar {
+      background: #c0c0c0;
+      padding: 2px 4px;
+      border-bottom: 1px solid #808080;
+      display: flex;
+      gap: 2px;
     }
-
-    header {
-      background: url('https://upload.wikimedia.org/wikipedia/commons/4/4f/Neon_glow.png') repeat-x, #012a4a;
-      padding: 12px 20px;
-      color: #fffb;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 34px;
-      color: #fff;
-      text-shadow: 2px 2px 0 #000;
-    }
-
-    nav {
-      background: #012a4a;
-      padding: 8px 12px;
-      border-top: 3px solid #03263a;
-    }
-    nav a {
-      color: #ffd;
-      margin-right: 12px;
+    .menubar a {
+      color: #000;
       text-decoration: none;
-      font-weight: bold;
+      padding: 2px 8px;
+      font-size: 13px;
+      display: inline-block;
     }
-    nav a:hover { text-decoration: underline }
+    .menubar a:hover {
+      background: #000080;
+      color: #fff;
+    }
 
-    section {
-      display: none;
-      padding: 20px;
+    /* === BARRA DE HERRAMIENTAS === */
+    .toolbar {
+      background: #c0c0c0;
+      padding: 4px 6px;
+      border-bottom: 2px groove #808080;
+      display: flex;
+      gap: 4px;
+      align-items: center;
     }
+    .toolbar-btn {
+      background: #c0c0c0;
+      border-top: 2px solid #ffffff;
+      border-left: 2px solid #ffffff;
+      border-right: 2px solid #808080;
+      border-bottom: 2px solid #808080;
+      padding: 3px 10px;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: 'MS Sans Serif', Arial, sans-serif;
+    }
+    .toolbar-btn:active {
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #ffffff;
+      border-bottom: 2px solid #ffffff;
+    }
+    .toolbar-sep {
+      width: 1px;
+      height: 22px;
+      background: #808080;
+      border-right: 1px solid #fff;
+      margin: 0 2px;
+    }
+
+    /* === CONTENIDO === */
+    .content-area {
+      padding: 10px;
+      background: #c0c0c0;
+    }
+
+    section { display: none; }
     section.active { display: block; }
+
+    /* === PANEL INSET === */
+    .inset-panel {
+      background: #fff;
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
 
     /* === GALERÍA === */
     .gallery {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
-      gap: 20px;
+      gap: 14px;
+      padding: 6px;
     }
 
     .item {
       display: flex;
-      text-align: center;
       flex-direction: column;
-      text-align: center;
       align-items: center;
-      font-family: monospace;
-      max-width: 260px;
+      max-width: 200px;
+    }
+
+    .img-frame {
+      background: #fff;
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 3px;
+    }
+
+    .gallery video {
+      max-width: 180px;
+      cursor: pointer;
+      display: block;
     }
 
     .gallery img {
-      max-width: 250px;
-      border: 3px outset #c7d6ff;
-      margin: 10px;
+      max-width: 180px;
+      display: block;
       cursor: pointer;
-      box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     .gallery img:hover {
-      transform: scale(1.05);
-      box-shadow: 4px 4px 12px rgba(0,0,0,0.2);
+      outline: 2px dotted #000080;
     }
 
     .titulo {
-      margin-top: 6px;
-      font-size: 14px;
-      color: #123;
-      background: #c7d6ff;
-      border: 2px inset #a5baff;
-      padding: 3px 6px;
-      display: inline-block;
-    }
-
-    /* === BOTÓN DESCARGAR === */
-    .descargar {
       margin-top: 4px;
-      background: #fff;
-      border: 2px outset #c0d8ff;
-      padding: 4px 8px;
-      text-decoration: none;
-      color: #123;
-      font-size: 12px;
-      font-weight: bold;
-    }
-    .descargar:hover {
-      background: #def;
+      font-size: 11px;
+      color: #000;
+      text-align: center;
+      max-width: 180px;
+      word-break: break-word;
     }
 
-    /* === VISOR LIGHTBOX === */
+    /* === CONTADOR === */
+    #visitCounter {
+      background: #fff;
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      padding: 2px 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    /* === LIGHTBOX estilo ventana Win98 === */
     #lightbox {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.85);
+      background: rgba(0,0,0,0.5);
       display: none;
       align-items: center;
       justify-content: center;
+      z-index: 100;
+    }
+    #lightbox.open { display: flex; }
+
+    .lb-window {
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #808080;
+      border-bottom: 2px solid #808080;
+      box-shadow: 4px 4px 0 #000;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
       flex-direction: column;
+    }
+
+    .lb-titlebar {
+      background: linear-gradient(to right, #000080, #1084d0);
+      color: #fff;
+      padding: 3px 6px;
+      font-weight: bold;
+      font-size: 13px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+    }
+
+    .lb-close {
+      background: #c0c0c0;
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #808080;
+      border-bottom: 1px solid #808080;
+      width: 18px;
+      height: 16px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lb-img-area {
+      touch-action: none;
+      padding: 6px;
+      background: #808080;
+      overflow: hidden;
+      width: 80vw;
+      height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: grab;
+    }
+    .lb-img-area:active { cursor: grabbing; }
+
+    #lb-img {
+      max-width: 78vw;
+      max-height: 68vh;
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+      transform-origin: center center;
+      transition: none;
+      user-select: none;
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .zoom-indicator {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      background: #c0c0c0;
+      border-top: 1px solid #fff;
+      border-left: 1px solid #fff;
+      border-right: 1px solid #808080;
+      border-bottom: 1px solid #808080;
+      padding: 1px 6px;
+      font-size: 11px;
+      font-family: 'MS Sans Serif', Arial, sans-serif;
       z-index: 10;
     }
 
-    #lightbox img {
-      max-width: 90%;
-      max-height: 80%;
-      border: 6px solid #fff;
-      box-shadow: 0 0 40px #000;
-      cursor: grab;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1);
-      transition: none;
+    .lb-statusbar {
+      background: #c0c0c0;
+      border-top: 1px solid #808080;
+      padding: 4px 8px;
+      display: flex;
+      gap: 4px;
+      justify-content: center;
     }
 
-    #lightbox img:active {
-      cursor: grabbing;
-    }
-
-    #lightbox .close {
-      position: absolute;
-      top: 18px;
-      right: 22px;
-      color: #fff;
-      font-size: 22px;
+    /* === WIN98 BUTTON === */
+    .w98-btn {
+      background: #c0c0c0;
+      border-top: 2px solid #ffffff;
+      border-left: 2px solid #ffffff;
+      border-right: 2px solid #808080;
+      border-bottom: 2px solid #808080;
+      padding: 6px 14px;
+      font-family: 'MS Sans Serif', Arial, sans-serif;
+      font-size: 14px;
       cursor: pointer;
-      z-index: 20;
+      min-width: 75px;
+    }
+    .w98-btn:active {
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #ffffff;
+      border-bottom: 2px solid #ffffff;
     }
 
-    #visitCounter, #viewCount {
-        font-family: monospace;
-        background: #eee;
-        padding: 3px 6px;
-        border: 1px inset #999;
-        display: inline-block;
+    /* === BARRA DE ESTADO === */
+    .statusbar {
+      background: #c0c0c0;
+      border-top: 2px solid #808080;
+      padding: 2px 8px;
+      font-size: 11px;
+      display: flex;
+      gap: 4px;
+    }
+    .status-panel {
+      border-top: 1px solid #808080;
+      border-left: 1px solid #808080;
+      border-right: 1px solid #fff;
+      border-bottom: 1px solid #fff;
+      padding: 1px 8px;
+      flex: 1;
     }
 
-    .nav-btns {
-      position: absolute;
-      bottom: 40px;
-      text-align: center;
-      z-index: 20;
+    /* === boton de reproducion de musica === */
+    .w98-player {  
+      width: 300px;
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #808080;
+      border-bottom: 2px solid #808080;
+      box-shadow: 2px 2px 0 #000;
+      margin: 10px auto;
     }
-    .nav-btns button {
-      background: #fff;
-      border: 2px outset #c0d8ff;
-      padding: 6px 12px;
-      cursor: pointer;
+
+    .player-titlebar {
+      background: linear-gradient(to right, #000080, #1084d0);
+      color: white;
+      padding: 3px 6px;
       font-weight: bold;
-      margin: 0 5px;
-    }
-    .nav-btns button:hover { background: #def; }
-
-    footer {
       font-size: 12px;
-      padding: 10px 18px;
-      background: #e9eef6;
-      border-top: 4px double #c0d8ff;
-      color: #123;
     }
 
-    @media (max-width:960px){
-      #wrap{width:94%;}
-      .gallery img{max-width: 45%;}
+    .player-body {
+      padding: 8px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 5px;
+      justify-content: center;
+      margin-bottom: 6px;
+    }
+
+    .controls button {
+      width: 40px;
+      height: 25px;
+      background: #c0c0c0;
+      border-top: 2px solid #fff;
+      border-left: 2px solid #fff;
+      border-right: 2px solid #808080;
+      border-bottom: 2px solid #808080;
+      cursor: pointer;
+    }
+
+    .controls button:active {
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+    }
+
+    #audioProgress {
+      width: 100%;
+    }
+
+    #videoBox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    
+    #videoBox.open {
+      display: flex;
+    }
+
+    /* === IMAGEN INICIO === */
+    #inicio img, #acerca img {
+      max-width: 80%;
+      display: block;
+      margin: 10px auto;
+      border-top: 2px solid #808080;
+      border-left: 2px solid #808080;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+    }
+
+    h2 {
+      font-size: 14px;
+      margin-top: 0;
+      color: #000080;
+    }
+
+    @media (max-width: 960px) {
+      #wrap { width: 98%; }
+      .gallery img { max-width: 130px; }
     }
   </style>
 </head>
-
 <body>
-  <div id="wrap">
-    <header>
-      <h1>Viñetas de Tabby</h1>
-      <p>Galería retro de cómics personales — estilo 2000s</p>
-    </header>
 
-    <nav>
-      <a href="#" onclick="showSection('inicio')">Inicio</a>
-      <a href="#" onclick="showSection('galeria')">Galería</a>
-      <a href="#" onclick="showSection('acerca')">Acerca</a>
-    </nav>
+<div id="wrap">
+
+  <!-- BARRA DE TÍTULO -->
+  <div class="titlebar">
+    <div class="titlebar-left">
+      <div class="titlebar-icon">🖼</div>
+      Viñetas de Tabby — [Galería]
+    </div>
+    <div class="titlebar-btns">
+      <button>_</button>
+      <button>□</button>
+      <button>✕</button>
+    </div>
+  </div>
+
+  <!-- BARRA DE MENÚ -->
+  <div class="menubar">
+    <a href="#" onclick="showSection('inicio')">Archivo</a>
+    <a href="#" onclick="showSection('galeria')">Ver</a>
+    <a href="#" onclick="showSection('acerca')">Acerca</a>
+    <a href="#" onclick="showSection('videos')">Videos</a>
+    <a href="#">Ayuda</a>
+  </div>
+
+  <!-- BARRA DE HERRAMIENTAS -->
+  <div class="toolbar">
+    <button class="toolbar-btn" onclick="showSection('inicio')">🏠 Inicio</button>
+    <div class="toolbar-sep"></div>
+    <button class="toolbar-btn" onclick="showSection('galeria')">🖼 Galería</button>
+    <div class="toolbar-sep"></div>
+    <button class="toolbar-btn" onclick="showSection('acerca')">ℹ Acerca</button>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div class="content-area">
 
     <!-- INICIO -->
     <section id="inicio" class="active">
-      <h2>Bienvenidos</h2>
-      <p>
-        <b>Tabby</b> es un personaje que yo cree un dia que estaba aburido, un observador sarcástico.
-        En estas viñetas encontrarás humor, ironía y un poco de nostalgia digital.
-      </p>
-      <p>
-        Cada historia es una pequeña ventana al absurdo cotidiano, dibujada con el espíritu de los blogs y foros de los años 2000.
-      </p>
-      <img src="comics/tabby.jpg" style="max-width:80%;border:3px outset #c7d6ff;margin-top:10px;">
+      <div class="inset-panel">
+        <h2>Bienvenidos</h2>
+        <p>
+          <b>Tabby</b> es un personaje que yo cree un dia que estaba aburrido, un observador sarcástico.
+          En estas viñetas encontrarás humor, ironía y un poco de nostalgia digital.
+        </p>
+        <p>
+          Cada historia es una pequeña ventana al absurdo cotidiano, dibujada con el espíritu de los blogs y foros de los años 2000.
+        </p>
+        <img src="comics/titulo.jpg" alt="Tabby">
+        <audio id="clickSound" src="sounds/windows-98-click.wav"></audio>
+      </div>
     </section>
 
     <!-- GALERÍA -->
     <section id="galeria">
-        <div id="visitCounter" style="font-size:12px;">
-            👁️ Visitas: 0
-        </div>
+      <div id="visitCounter">👁 Visitas: 0</div>
       <h2>Galería de Viñetas</h2>
-      <div class="gallery">
+      <div class="inset-panel">
+        <div class="gallery">
 
-        <div class="item">
-          <img src="comics/comic1.jpg" onclick="openLightbox(0)">
-          <p class="titulo">Tabby</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic1.jpg" onclick="openLightbox(0)" alt="comic1"></div>
+            <p class="titulo">Tabby</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic2.jpg" onclick="openLightbox(1)">
-          <p class="titulo">prima</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic2.jpg" onclick="openLightbox(1)" alt="comic2"></div>
+            <p class="titulo">prima</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic3.jpg" onclick="openLightbox(2)">
-          <p class="titulo">dios maquina</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic3.jpg" onclick="openLightbox(2)" alt="comic3"></div>
+            <p class="titulo">dios maquina</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic4.jpg" onclick="openLightbox(3)">
-          <p class="titulo">regreso de bubsy</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic4.jpg" onclick="openLightbox(3)" alt="comic4"></div>
+            <p class="titulo">regreso de bubsy</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic5.jpg" onclick="openLightbox(4)">
-          <p class="titulo">viscacha</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic5.jpg" onclick="openLightbox(4)" alt="comic5"></div>
+            <p class="titulo">viscacha</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic6.jpg" onclick="openLightbox(5)">
-          <p class="titulo">La ropa</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic6.jpg" onclick="openLightbox(5)" alt="comic6"></div>
+            <p class="titulo">La ropa</p>
+          </div>
 
-        <div class="item">
-            <img src="comics/comic7.jpg" onclick="openLightbox(6)">
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic7.jpg" onclick="openLightbox(6)" alt="comic7"></div>
             <p class="titulo">la pizza</p>
-        </div>
+          </div>
 
-        <div class="item">
-            <img src="comics/comic8.jpg" onclick="openLightbox(7)">
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic8.jpg" onclick="openLightbox(7)" alt="comic8"></div>
             <p class="titulo">La ortografía</p>
-        </div>
+          </div>
 
-        <div class="item">
-            <img src="comics/comic9.jpg" onclick="openLightbox(8)">
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic9.jpg" onclick="openLightbox(8)" alt="comic9"></div>
             <p class="titulo">rock</p>
-        </div>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic10.jpg" onclick="openLightbox(9)">
-          <p class="titulo">cuando estaba en secundaria</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic10.jpg" onclick="openLightbox(9)" alt="comic10"></div>
+            <p class="titulo">cuando estaba en secundaria</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic11.jpg" onclick="openLightbox(10)">
-          <p class="titulo">la calavera</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic11.jpg" onclick="openLightbox(10)" alt="comic11"></div>
+            <p class="titulo">la calavera</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic12.jpg" onclick="openLightbox(11)">
-          <p class="titulo">tergeta</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic12.jpg" onclick="openLightbox(11)" alt="comic12"></div>
+            <p class="titulo">tergeta</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic13.jpg" onclick="openLightbox(12)">
-          <p class="titulo">demonios</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic13.jpg" onclick="openLightbox(12)" alt="comic13"></div>
+            <p class="titulo">demonios</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic14.jpg" onclick="openLightbox(13)">
-          <p class="titulo">la comunidad de los Argentinos</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic14.jpg" onclick="openLightbox(13)" alt="comic14"></div>
+            <p class="titulo">la comunidad de los Argentinos</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic15.jpg" onclick="openLightbox(14)">
-          <p class="titulo">estilo</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic15.jpg" onclick="openLightbox(14)" alt="comic15"></div>
+            <p class="titulo">estilo</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic16.jpg" onclick="openLightbox(15)">
-          <p class="titulo">invasion</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic16.jpg" onclick="openLightbox(15)" alt="comic16"></div>
+            <p class="titulo">invasion</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic17.jpg" onclick="openLightbox(16)">
-          <p class="titulo">pc lenta</p>
-        </div>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic17.jpg" onclick="openLightbox(16)" alt="comic17"></div>
+            <p class="titulo">pc lenta</p>
+          </div>
 
-        <div class="item">
-          <img src="comics/comic18.jpg" onclick="openLightbox(17)">
-          <p class="titulo">hackeo</p>
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic18.jpg" onclick="openLightbox(17)" alt="comic18"></div>
+            <p class="titulo">hackeo</p>
+          </div>
+
         </div>
-        
       </div>
     </section>
 
     <!-- ACERCA -->
     <section id="acerca">
-      <h2>Acerca del Proyecto</h2>
-      <p><i>Viñetas de Tabby</i> es una colección personal inspirada en los blogs y páginas caseras 2000s.</p>
-      <img src="comics/amiga.jpg" style="max-width:80%;border:3px outset #c7d6ff;margin-top:10px;">
-      <img src="comics/meme.jpg" style="max-width:80%;border:3px outset #c7d6ff;margin-top:10px;">
-      <img src="comics/mila.jpg" style="max-width:80%;border:3px outset #c7d6ff;margin-top:10px;">
+      <div class="inset-panel">
+        <h2>Acerca del Proyecto</h2>
+        <p><i>Viñetas de Tabby</i> es una colección personal inspirada en los blogs y páginas caseras de los 2000s.</p>
+        <img src="comics/amiga.jpg" alt="amiga">
+        <img src="comics/meme.jpg" alt="meme">
+        <img src="comics/mila.jpg" alt="mila">
+      </div>
     </section>
-    
-    <footer>&copy; 2025 — Proyecto Retro.</footer>
+
+    <!-- SECCIÓN DE VIDEOS -->
+    <section id="videos">
+      <h2>Galería de Videos</h2>
+
+      <div class="inset-panel">
+        <div class="gallery">
+
+          <div class="item">
+            <div class="img-frame">
+              <video src="videos/future gen. consels.mp4" onclick="openVideo(0)"></video>
+            </div>
+            <p class="titulo">Video 1</p>
+          </div>
+
+          <div class="item">
+            <div class="img-frame">
+              <video src="videos/Rick Astley - Never Gonna Give You Up.mp4" onclick="openVideo(1)"></video>
+            </div>
+            <p class="titulo">Video 2</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
   </div>
 
-  <!-- VISOR LIGHTBOX -->
-  <div id="lightbox" onclick="closeLightbox(event)">
-    <div class="close" onclick="closeLightbox(event)">✕</div>
-    <img id="lb-img">
-    <div class="nav-btns">
-      <button onclick="prevImg(event)">⟨ Anterior</button>
-      <button onclick="nextImg(event)">Siguiente ⟩</button>
-      <button onclick="downloadCurrent()">Descargar</button>
+  <!-- BARRA DE ESTADO -->
+  <div class="statusbar">
+    <div class="status-panel" id="statusMsg">Listo</div>
+    <div class="status-panel" style="flex:0;min-width:120px;text-align:center;">Viñetas de Tabby</div>
+  </div>
+
+</div>
+
+<!-- REPRODUCTOR DE MÚSICA estilo Windows 98 -->
+<div id="videoBox" onclick="closeVideoBg(event)">
+  <div class="lb-window">
+    
+    <div class="lb-titlebar">
+      <span>🎬 Visor de video</span>
+      <button class="lb-close" onclick="closeVideo()">✕</button>
+    </div>
+
+    <div class="lb-img-area" style="background:#000;">
+      <video id="videoViewer" controls style="max-width:100%; max-height:100%;"></video>
+    </div>
+
+    <div class="lb-statusbar">
+      <button class="w98-btn" onclick="prevVideo()">◄ Anterior</button>
+      <button class="w98-btn" onclick="nextVideo()">Siguiente ►</button>
+      <button class="w98-btn" onclick="closeVideo()">Cerrar</button>
+    </div>
+
+  </div>
+</div>  
+
+<!-- REPRODUCTOR DE MÚSICA estilo Windows 98 -->
+<div class="w98-player">
+  <div class="player-titlebar">
+    <span>🎵 Reproductor de Música</span>
+  </div>
+
+  <div class="player-body">
+    <audio id="audioPlayer" src="musica/aquatic ambience.mp3"></audio>
+
+    <div class="controls">
+      <button onclick="playAudio()">▶</button>
+      <button onclick="pauseAudio()">⏸</button>
+      <button onclick="stopAudio()">⏹</button>
+    </div>
+
+    <input type="range" id="audioProgress" value="0">
+  </div>
+</div>
+
+<!-- LIGHTBOX estilo ventana Windows 98 -->
+<div id="lightbox" onclick="closeLightboxBg(event)">
+  <div class="lb-window">
+    <div class="lb-titlebar">
+      <span>🖼 Visor de imagen</span>
+      <button class="lb-close" onclick="closeLightbox()">✕</button>
+    </div>
+    <div class="lb-img-area" id="lb-area">
+      <img id="lb-img" src="" alt="visor" draggable="false">
+      <div class="zoom-indicator" id="zoom-label">100%</div>
+    </div>
+    <div class="lb-statusbar">
+      <button class="w98-btn" onclick="prevImg()">◄ Anterior</button>
+      <button class="w98-btn" onclick="nextImg()">Siguiente ►</button>
+      <button class="w98-btn" style="min-width:40px;" onclick="zoomIn()">🔍+</button>
+      <button class="w98-btn" style="min-width:40px;" onclick="zoomOut()">🔍-</button>
+      <button class="w98-btn" onclick="resetZoom()">1:1</button>
+      <button class="w98-btn" onclick="downloadCurrent()">💾 Guardar</button>
+      <button class="w98-btn" onclick="closeLightbox()">Cerrar</button>
     </div>
   </div>
+</div>
 
-  <script>
-    // --- Cambiar secciones ---
-    function showSection(id){
-      document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
+<script>
+  function showSection(id) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    document.getElementById('statusMsg').textContent = 'Sección: ' + id.charAt(0).toUpperCase() + id.slice(1);
+  }
 
-    // --- Lightbox ---
-    const imgs = Array.from(document.querySelectorAll('.gallery img'));
-    let currentIndex = 0;
+  const imgs = Array.from(document.querySelectorAll('.gallery img'));
+  let currentIndex = 0;
 
-    function openLightbox(index){
-      currentIndex = index;
-      document.getElementById('lb-img').src = imgs[index].src;
-      document.getElementById('lightbox').style.display = 'flex';
-      resetImagePosition();
-    }
+  // Zoom y arrastre
+  let zoom = 1;
+  let posX = 0, posY = 0;
+  let isDragging = false;
+  let startX, startY;
 
-    function closeLightbox(e){
-      if(e.target.id === 'lightbox' || e.target.classList.contains('close')){
-        document.getElementById('lightbox').style.display = 'none';
-      }
-    }
+  function applyTransform() {
+    const img = document.getElementById('lb-img');
+    img.style.transform = `translate(calc(-50% + ${posX}px), calc(-50% + ${posY}px)) scale(${zoom})`;
+    img.style.left = '50%';
+    img.style.top = '50%';
+    document.getElementById('zoom-label').textContent = Math.round(zoom * 100) + '%';
+  }
 
-    function nextImg(e){
-      e.stopPropagation();
-      currentIndex = (currentIndex + 1) % imgs.length;
-      document.getElementById('lb-img').src = imgs[currentIndex].src;
-      resetImagePosition();
-    }
+  function resetZoom() {
+    zoom = 1; posX = 0; posY = 0;
+    applyTransform();
+  }
 
-    function prevImg(e){
-      e.stopPropagation();
-      currentIndex = (currentIndex - 1 + imgs.length) % imgs.length;
-      document.getElementById('lb-img').src = imgs[currentIndex].src;
-      resetImagePosition();
-    }
+  function zoomIn() {
+    zoom = Math.min(zoom + 0.25, 5);
+    applyTransform();
+  }
 
-    // FUNCION PARA DESCARGAR DESDE LIGHTBOX
-    function downloadCurrent(){
-      const url = imgs[currentIndex].src;
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = url.substring(url.lastIndexOf('/')+1);
-      a.click();
-    }
+  function zoomOut() {
+    zoom = Math.max(zoom - 0.25, 0.25);
+    applyTransform();
+  }
 
-    // FUNCION PARA DESCARGAR DESDE LIGHTBOX
-    function countVisit() {
-        let visits = parseInt(localStorage.getItem("pageVisits")) || 0;
-        let visited = localStorage.getItem("visited");
+  // Rueda del mouse
+  document.getElementById('lb-area').addEventListener('wheel', function(e) {
+    e.preventDefault();
+    zoom += e.deltaY * -0.002;
+    zoom = Math.min(Math.max(zoom, 0.25), 5);
+    applyTransform();
+  }, { passive: false });
 
-        if (!visited) {
-            visits++;
-            localStorage.setItem("pageVisits", visits);
-            localStorage.setItem("visited", "true");
-        }
+  // sonido de clik en todos los botones
+  document.querySelectorAll('button, a').forEach(el => {
+    el.addEventListener('click', playClick);
+  });
 
-        document.getElementById("visitCounter").textContent =
-            "👁️ Visitas: " + visits;
-    }
+  // Arrastrar con mouse
+  document.getElementById('lb-area').addEventListener('mousedown', function(e) {
+    isDragging = true;
+    startX = e.clientX - posX;
+    startY = e.clientY - posY;
+    this.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mouseup', function() {
+    isDragging = false;
+    document.getElementById('lb-area').style.cursor = 'grab';
+  });
+  window.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    posX = e.clientX - startX;
+    posY = e.clientY - startY;
+    applyTransform();
+  });
 
+  // reproductor de video
+  const videos = Array.from(document.querySelectorAll('#videos video'));
+  let currentVideo = 0;
 
-    // --- Arrastrar imagen + Zoom ---
-    const modalImg = document.getElementById("lb-img");
-    let isDragging = false;
-    let startX, startY, imgX = 0, imgY = 0, zoom = 1;
+  function openVideo(index) {
+    currentVideo = index;
+    const viewer = document.getElementById('videoViewer');
+    viewer.src = videos[index].src;
+    document.getElementById('videoBox').classList.add('open');
+  }
 
-    function resetImagePosition(){
-      imgX = 0; imgY = 0; zoom = 1;
-      modalImg.style.transform = 'translate(-50%, -50%) scale(1)';
-    }
+  function closeVideo() {
+    const viewer = document.getElementById('videoViewer');
+    viewer.pause();
+    document.getElementById('videoBox').classList.remove('open');
+  }
 
-    modalImg.addEventListener("mousedown", e => {
+  function closeVideoBg(e) {
+    if (e.target.id === 'videoBox') closeVideo();
+  }
+
+  function nextVideo() {
+    currentVideo = (currentVideo + 1) % videos.length;
+    document.getElementById('videoViewer').src = videos[currentVideo].src;
+  }
+
+  function prevVideo() {
+    currentVideo = (currentVideo - 1 + videos.length) % videos.length;
+    document.getElementById('videoViewer').src = videos[currentVideo].src;
+  }
+
+  // sonido de click
+  const clickSound = document.getElementById('clickSound');
+
+  function playClick() {
+    clickSound.currentTime = 0;
+    clickSound.play();
+  }
+  
+
+  // reproductor de musica
+  const audio = document.getElementById('audioPlayer');
+  const progress = document.getElementById('audioProgress');
+
+  function playAudio() {
+    audio.play();
+  }
+
+  function pauseAudio() {
+    audio.pause();
+  }
+
+  function stopAudio() {
+    audio.pause();
+    audio.currentTime = 0;
+  }
+
+  audio.addEventListener('timeupdate', () => {
+    progress.value = (audio.currentTime / audio.duration) * 100 || 0;
+  });
+
+  progress.addEventListener('input', () => {
+    audio.currentTime = (progress.value / 100) * audio.duration;
+  });
+  // teclas
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') nextImg();
+    if (e.key === 'ArrowLeft') prevImg();
+    if (e.key === 'Escape') closeLightbox();
+  });
+
+  // Touch para celular
+  const area = document.getElementById('lb-area');
+
+  area.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 1) {
       isDragging = true;
-      startX = e.clientX - imgX;
-      startY = e.clientY - imgY;
-      modalImg.style.cursor = "grabbing";
-    });
+      startX = e.touches[0].clientX - posX;
+      startY = e.touches[0].clientY - posY;
+    }
+  }, { passive: false });
 
-    window.addEventListener("mouseup", () => {
-      isDragging = false;
-      modalImg.style.cursor = "grab";
-    });
+  area.addEventListener('touchmove', function(e) {
+    if (e.touches.length === 1 && isDragging) {
+      e.preventDefault(); // 🔥 CLAVE
+    
+      posX = e.touches[0].clientX - startX;
+      posY = e.touches[0].clientY - startY;
 
-    window.addEventListener("mousemove", e => {
-      if (!isDragging) return;
-      e.preventDefault();
-      imgX = e.clientX - startX;
-      imgY = e.clientY - startY;
-      modalImg.style.transform = `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${zoom})`;
-    });
+      applyTransform();
+    }
+  }, { passive: false });
+  
+  area.addEventListener('touchend', function() {
+    isDragging = false;
+  });
+  window.addEventListener('touchend', () => isDragging = false);
+  window.addEventListener('touchmove', function(e) {
+    if (!isDragging || e.touches.length !== 1) return;
+    posX = e.touches[0].clientX - startX;
+    posY = e.touches[0].clientY - startY;
+    applyTransform();
+  });
 
-    modalImg.addEventListener("wheel", e => {
-      e.preventDefault();
-      zoom += e.deltaY * -0.0015;
-      zoom = Math.min(Math.max(zoom, 0.5), 3);
-      modalImg.style.transform = `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${zoom})`;
-    });
+  function openLightbox(index) {
+    currentIndex = index;
+    document.getElementById('lb-img').src = imgs[index].src;
+    document.getElementById('lightbox').classList.add('open');
+    document.getElementById('statusMsg').textContent = 'Viendo: ' + imgs[index].alt;
+    resetZoom();
+  }
 
-    window.onload = () => {
-        countVisit();
-    };
-  </script>
+  function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.getElementById('statusMsg').textContent = 'Listo';
+    resetZoom();
+  }
+
+  function closeLightboxBg(e) {
+    if (e.target.id === 'lightbox') closeLightbox();
+  }
+
+  function nextImg() {
+    currentIndex = (currentIndex + 1) % imgs.length;
+    document.getElementById('lb-img').src = imgs[currentIndex].src;
+    resetZoom();
+  }
+
+  function prevImg() {
+    currentIndex = (currentIndex - 1 + imgs.length) % imgs.length;
+    document.getElementById('lb-img').src = imgs[currentIndex].src;
+    resetZoom();
+  }
+
+  function downloadCurrent() {
+    const url = imgs[currentIndex].src;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = url.substring(url.lastIndexOf('/') + 1);
+    a.click();
+  }
+
+  function countVisit() {
+    let visits = parseInt(localStorage.getItem('pageVisits')) || 0;
+    if (!localStorage.getItem('visited')) {
+      visits++;
+      localStorage.setItem('pageVisits', visits);
+      localStorage.setItem('visited', 'true');
+    }
+    document.getElementById('visitCounter').textContent = '👁 Visitas: ' + visits;
+  }
+
+  window.onload = () => { countVisit(); };
+</script>
 </body>
 </html>
