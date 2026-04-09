@@ -233,10 +233,22 @@
       border-right: 2px solid #808080;
       border-bottom: 2px solid #808080;
       box-shadow: 4px 4px 0 #000;
-      max-width: 90vw;
+      max-width: 95vw;
       max-height: 90vh;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
+    }
+
+    .lb-content img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    .lb-content {
+      max-height: calc(90vh - 60px); /* ajusta según tu titlebar */
+      overflow: auto;
     }
 
     .lb-titlebar {
@@ -425,6 +437,20 @@
       display: flex;
     }
 
+    #helpBox {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+    }
+
+    #helpBox.open {
+      display: flex;
+    }
+
     /* === IMAGEN INICIO === */
     #inicio img, #acerca img {
       max-width: 80%;
@@ -442,9 +468,13 @@
       color: #000080;
     }
 
-    @media (max-width: 960px) {
-      #wrap { width: 98%; }
-      .gallery img { max-width: 130px; }
+    @media (max-width: 768px) {
+      .lb-window {
+        width: 95vw !important;
+        height: auto !important;
+        left: 2.5vw !important;
+        top: 5vh !important;
+      }
     }
   </style>
 </head>
@@ -471,7 +501,7 @@
     <a href="#" onclick="showSection('galeria')">Ver</a>
     <a href="#" onclick="showSection('acerca')">Acerca</a>
     <a href="#" onclick="showSection('videos')">Videos</a>
-    <a href="#">Ayuda</a>
+    <a href="#" onclick="openHelp()">Ayuda</a>
   </div>
 
   <!-- BARRA DE HERRAMIENTAS -->
@@ -499,7 +529,25 @@
         </p>
         <img src="comics/titulo.jpg" alt="Tabby">
         <audio id="clickSound" src="sounds/windows-98-click.wav"></audio>
+        <!-- REPRODUCTOR DE MÚSICA estilo Windows 98 -->
+        <div class="w98-player">
+          <div class="player-titlebar">
+            <span>🎵 Reproductor de Música</span>
+        </div>
+
+        <div class="player-body">
+          <audio id="audioPlayer" src="musica/aquatic ambience.mp3"></audio>
+
+          <div class="controls">
+            <button onclick="playAudio()">▶</button>
+            <button onclick="pauseAudio()">⏸</button>
+            <button onclick="stopAudio()">⏹</button>
+          </div>
+
+          <input type="range" id="audioProgress" value="0">
+        </div>
       </div>
+    </div>
     </section>
 
     <!-- GALERÍA -->
@@ -566,7 +614,7 @@
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic12.jpg" onclick="openLightbox(11)" alt="comic12"></div>
-            <p class="titulo">tergeta</p>
+            <p class="titulo">tarjeta</p>
           </div>
 
           <div class="item">
@@ -602,6 +650,40 @@
         </div>
       </div>
     </section>
+
+    <!-- VENTANA DE AYUDA -->
+    <div id="helpBox" onclick="closeHelpBg(event)">
+      <div class="lb-window">
+
+        <div class="lb-titlebar">
+          <span>🆘 Ayuda</span>
+          <button class="lb-close" onclick="closeHelp()">✕</button>
+        </div>
+
+        <div class="lb-img-area" style="background:#c0c0c0; cursor: default;">
+
+          <div style="background:#fff; padding:10px; border:2px inset #808080; max-width:400px;">
+            <h3>Bienvenido a Viñetas de Tabby</h3>
+
+            <p>🖼 Usa la pestaña <b>Galería</b> para ver las viñetas.</p>
+            <p>🎬 En <b>Videos</b> puedes ver animaciones.</p>
+            <p>🎵 Usa el reproductor para escuchar música.</p>
+            <p>🔍 Haz clic en una imagen para ampliarla.</p>
+            <p>🖱 Puedes mover algunas ventanas como en Windows 98.</p>
+
+            <hr>
+
+            <p><b>Consejo:</b> Prueba todos los botones 😉</p>
+          </div>
+
+        </div>
+
+        <div class="lb-statusbar">
+          <button class="w98-btn" onclick="closeHelp()">Aceptar</button>
+        </div>
+
+    </div>
+  </div>
 
     <!-- ACERCA -->
     <section id="acerca">
@@ -671,25 +753,6 @@
   </div>
 </div>  
 
-<!-- REPRODUCTOR DE MÚSICA estilo Windows 98 -->
-<div class="w98-player">
-  <div class="player-titlebar">
-    <span>🎵 Reproductor de Música</span>
-  </div>
-
-  <div class="player-body">
-    <audio id="audioPlayer" src="musica/aquatic ambience.mp3"></audio>
-
-    <div class="controls">
-      <button onclick="playAudio()">▶</button>
-      <button onclick="pauseAudio()">⏸</button>
-      <button onclick="stopAudio()">⏹</button>
-    </div>
-
-    <input type="range" id="audioProgress" value="0">
-  </div>
-</div>
-
 <!-- LIGHTBOX estilo ventana Windows 98 -->
 <div id="lightbox" onclick="closeLightboxBg(event)">
   <div class="lb-window">
@@ -722,6 +785,49 @@
 
   const imgs = Array.from(document.querySelectorAll('.gallery img'));
   let currentIndex = 0;
+
+  // === SISTEMA GLOBAL DE VENTANAS ARRASTRABLES ===
+  let activeWindow = null;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  document.querySelectorAll('.lb-titlebar').forEach(titlebar => {
+    titlebar.addEventListener('mousedown', (e) => {
+
+      activeWindow = titlebar.parentElement;
+
+      offsetX = e.clientX - activeWindow.offsetLeft;
+      offsetY = e.clientY - activeWindow.offsetTop;
+
+      activeWindow.style.position = 'absolute';
+      activeWindow.style.zIndex = 999;
+
+    });
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!activeWindow) return;
+
+    activeWindow.style.left = (e.clientX - offsetX) + 'px';
+    activeWindow.style.top = (e.clientY - offsetY) + 'px';
+  });
+
+  window.addEventListener('mouseup', () => {
+    activeWindow = null;
+  });
+
+  // ayuda boton
+  function openHelp() {
+    document.getElementById('helpBox').classList.add('open');
+  }
+
+  function closeHelp() {
+    document.getElementById('helpBox').classList.remove('open');
+  }
+
+  function closeHelpBg(e) {
+    if (e.target.id === 'helpBox') closeHelp();
+  }
 
   // Zoom y arrastre
   let zoom = 1;
