@@ -233,22 +233,10 @@
       border-right: 2px solid #808080;
       border-bottom: 2px solid #808080;
       box-shadow: 4px 4px 0 #000;
-      max-width: 95vw;
+      max-width: 90vw;
       max-height: 90vh;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
-    }
-
-    .lb-content img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
-    
-    .lb-content {
-      max-height: calc(90vh - 60px); /* ajusta según tu titlebar */
-      overflow: auto;
     }
 
     .lb-titlebar {
@@ -468,13 +456,9 @@
       color: #000080;
     }
 
-    @media (max-width: 768px) {
-      .lb-window {
-        width: 95vw !important;
-        height: auto !important;
-        left: 2.5vw !important;
-        top: 5vh !important;
-      }
+    @media (max-width: 960px) {
+      #wrap { width: 98%; }
+      .gallery img { max-width: 130px; }
     }
   </style>
 </head>
@@ -785,36 +769,6 @@
 
   const imgs = Array.from(document.querySelectorAll('.gallery img'));
   let currentIndex = 0;
-
-  // === SISTEMA GLOBAL DE VENTANAS ARRASTRABLES ===
-  let activeWindow = null;
-  let offsetX = 0;
-  let offsetY = 0;
-
-  document.querySelectorAll('.lb-titlebar').forEach(titlebar => {
-    titlebar.addEventListener('mousedown', (e) => {
-
-      activeWindow = titlebar.parentElement;
-
-      offsetX = e.clientX - activeWindow.offsetLeft;
-      offsetY = e.clientY - activeWindow.offsetTop;
-
-      activeWindow.style.position = 'absolute';
-      activeWindow.style.zIndex = 999;
-
-    });
-  });
-
-  window.addEventListener('mousemove', (e) => {
-    if (!activeWindow) return;
-
-    activeWindow.style.left = (e.clientX - offsetX) + 'px';
-    activeWindow.style.top = (e.clientY - offsetY) + 'px';
-  });
-
-  window.addEventListener('mouseup', () => {
-    activeWindow = null;
-  });
 
   // ayuda boton
   function openHelp() {
