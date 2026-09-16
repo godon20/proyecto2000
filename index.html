@@ -558,32 +558,32 @@
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic4.jpg" onclick="openLightbox(3)" alt="comic4"></div>
-            <p class="titulo">regreso de bubsy</p>
+            <p class="titulo">se mojo la ropa</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic5.jpg" onclick="openLightbox(4)" alt="comic5"></div>
-            <p class="titulo">viscacha</p>
+            <p class="titulo">la ropa</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic6.jpg" onclick="openLightbox(5)" alt="comic6"></div>
-            <p class="titulo">La ropa</p>
+            <p class="titulo">pizza</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic7.jpg" onclick="openLightbox(6)" alt="comic7"></div>
-            <p class="titulo">la pizza</p>
+            <p class="titulo">los edgis</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic8.jpg" onclick="openLightbox(7)" alt="comic8"></div>
-            <p class="titulo">La ortografía</p>
+            <p class="titulo">musica</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic9.jpg" onclick="openLightbox(8)" alt="comic9"></div>
-            <p class="titulo">rock</p>
+            <p class="titulo">patineta</p>
           </div>
 
           <div class="item">
@@ -593,12 +593,12 @@
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic11.jpg" onclick="openLightbox(10)" alt="comic11"></div>
-            <p class="titulo">la calavera</p>
+            <p class="titulo">targeta</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic12.jpg" onclick="openLightbox(11)" alt="comic12"></div>
-            <p class="titulo">tarjeta</p>
+            <p class="titulo">caza</p>
           </div>
 
           <div class="item">
@@ -608,27 +608,42 @@
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic14.jpg" onclick="openLightbox(13)" alt="comic14"></div>
-            <p class="titulo">la comunidad de los Argentinos</p>
+            <p class="titulo">el segundo</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic15.jpg" onclick="openLightbox(14)" alt="comic15"></div>
-            <p class="titulo">estilo</p>
+            <p class="titulo">la pc lenta</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic16.jpg" onclick="openLightbox(15)" alt="comic16"></div>
-            <p class="titulo">invasion</p>
+            <p class="titulo">mi amiga</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic17.jpg" onclick="openLightbox(16)" alt="comic17"></div>
-            <p class="titulo">pc lenta</p>
+            <p class="titulo">jackeo</p>
           </div>
 
           <div class="item">
             <div class="img-frame"><img src="comics/comic18.jpg" onclick="openLightbox(17)" alt="comic18"></div>
-            <p class="titulo">hackeo</p>
+            <p class="titulo">celu</p>
+          </div>
+
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic19.jpg" onclick="openLightbox(18)" alt="comic19"></div>
+            <p class="titulo">mili</p>
+          </div>
+
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic20.jpg" onclick="openLightbox(19)" alt="comic20"></div>
+            <p class="titulo">el bario</p>
+          </div>
+
+          <div class="item">
+            <div class="img-frame"><img src="comics/comic21.jpg" onclick="openLightbox(20)" alt="comic21"></div>
+            <p class="titulo">la casa</p>
           </div>
 
         </div>
@@ -677,6 +692,8 @@
         <img src="comics/amiga.jpg" alt="amiga">
         <img src="comics/meme.jpg" alt="meme">
         <img src="comics/mila.jpg" alt="mila">
+        <img src="comics/tabby2.jpg" alt="tabby2">
+        <img src="comics/casa.jpg" alt="casa">
       </div>
     </section>
 
@@ -699,6 +716,20 @@
               <video src="videos/Rick Astley - Never Gonna Give You Up.mp4" onclick="openVideo(1)"></video>
             </div>
             <p class="titulo">Video 2</p>
+          </div>
+
+          <div class="item">
+            <div class="img-frame">
+              <video src="videos/mili.mp4" onclick="openVideo(2)"></video>
+            </div>
+            <p class="titulo">Video 3</p>
+          </div>
+
+          <div class="item">
+            <div class="img-frame">
+              <video src="videos/primer-video_0001.mp4" onclick="openVideo(3)"></video>
+            </div>
+            <p class="titulo">Video 4</p>
           </div>
 
         </div>
@@ -769,6 +800,38 @@
 
   const imgs = Array.from(document.querySelectorAll('.gallery img'));
   let currentIndex = 0;
+
+  // === SISTEMA GLOBAL DE VENTANAS ARRASTRABLES ===
+  let activeWindow = null;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  document.querySelectorAll('.lb-titlebar').forEach(titlebar => {
+    titlebar.addEventListener('mousedown', (e) => {
+
+      activeWindow = titlebar.parentElement;
+
+      offsetX = e.clientX - activeWindow.offsetLeft;
+      offsetY = e.clientY - activeWindow.offsetTop;
+
+      activeWindow.style.position = 'absolute';
+      activeWindow.style.zIndex = 999;
+
+    });
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!activeWindow) return;
+
+    activeWindow.style.left = (e.clientX - offsetX) + 'px';
+    activeWindow.style.top = (e.clientY - offsetY) + 'px';
+  });
+
+  window.addEventListener('mouseup', () => {
+    activeWindow = null;
+  });
+
+
 
   // ayuda boton
   function openHelp() {
